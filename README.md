@@ -1,6 +1,6 @@
 # CalcX — Commercial-Grade All-in-One Calculator Suite
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![License](https://img.shields.io/badge/license-Proprietary-red.svg)
 ![Tests](https://img.shields.io/badge/tests-140%2F140%20passing-success.svg)
 ![PWA Ready](https://img.shields.io/badge/PWA-Ready-purple.svg)
 ![Security](https://img.shields.io/badge/Security-Zero%20eval%28%29-brightgreen.svg)
@@ -100,6 +100,18 @@ npm test
 
 ---
 
-## 📄 License
+## License
 
-This project is licensed under the [MIT License](LICENSE).
+CalcX is proprietary software.
+
+Copyright © 2026 Visakan. All Rights Reserved.
+
+The CalcX source code may be viewed and studied for personal, educational,
+and evaluation purposes subject to the terms of the LICENSE file.
+
+Commercial use, redistribution, substantial copying, or creation of
+competing products based on the CalcX source code requires prior written
+permission from the copyright owner.
+
+Third-party libraries and dependencies remain subject to their respective
+licenses.

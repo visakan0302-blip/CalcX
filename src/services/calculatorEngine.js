@@ -38,6 +38,59 @@ export function factorial(n) {
   return result;
 }
 
+// Compute combinations (nCr)
+export function combinations(n, r) {
+  if (!Number.isInteger(n) || !Number.isInteger(r) || n < 0 || r < 0 || r > n) {
+    throw new Error('nCr requires non-negative integers with n >= r');
+  }
+  if (r === 0 || r === n) return 1;
+  if (r > n / 2) r = n - r;
+  let res = 1;
+  for (let i = 1; i <= r; i++) {
+    res = (res * (n - r + i)) / i;
+  }
+  return Math.round(res);
+}
+
+// Compute permutations (nPr)
+export function permutations(n, r) {
+  if (!Number.isInteger(n) || !Number.isInteger(r) || n < 0 || r < 0 || r > n) {
+    throw new Error('nPr requires non-negative integers with n >= r');
+  }
+  let res = 1;
+  for (let i = 0; i < r; i++) {
+    res *= (n - i);
+  }
+  return Math.round(res);
+}
+
+// Convert a decimal number to exact/best rational fraction (continued fraction algorithm)
+export function toFraction(val, tolerance = 1e-9, maxDen = 100000) {
+  if (typeof val !== 'number' || !isFinite(val) || isNaN(val)) return null;
+  if (Number.isInteger(val)) return { n: val, d: 1 };
+  const sign = val < 0 ? -1 : 1;
+  let x = Math.abs(val);
+
+  let h1 = 1, h2 = 0, k1 = 0, k2 = 1;
+  let b = x;
+  do {
+    const a = Math.floor(b);
+    let aux = h1;
+    h1 = a * h1 + h2;
+    h2 = aux;
+    aux = k1;
+    k1 = a * k1 + k2;
+    k2 = aux;
+    if (k1 > maxDen) break;
+    const diff = b - a;
+    if (Math.abs(diff) < 1e-12) break;
+    b = 1 / diff;
+  } while (Math.abs(x - h1 / k1) > tolerance && b !== Infinity && isFinite(b));
+
+  if (k1 > maxDen || k1 === 0) return null;
+  return { n: sign * h1, d: k1 };
+}
+
 /**
  * Tokenizes math expressions into structured tokens
  * @param {string} expr Math expression string
@@ -55,6 +108,16 @@ export function tokenize(expr, options = {}) {
     .replace(/−/g, '-')
     .replace(/π/g, 'pi')
     .trim();
+
+  // Normalize mixed numbers: e.g. "1 1/2" -> "((1*2+1)/2)"
+  cleanExpr = cleanExpr.replace(/\b(\d+)\s+(\d+)\/(\d+)\b/g, '(($1*$3+$2)/$3)');
+
+  // Normalize fraction division: e.g. "5/6 / 2/3" or "5/6 ÷ 2/3" -> "((5/6)/(2/3))"
+  cleanExpr = cleanExpr.replace(/(\d+)\/(\d+)\s*[\/÷]\s*(\d+)\/(\d+)/g, '(($1/$2)/($3/$4))');
+
+  // Normalize combinatorics: e.g. "8C2" -> "8 nCr 2", "8P2" -> "8 nPr 2"
+  cleanExpr = cleanExpr.replace(/\b(\d+)\s*(?:[cC]|nCr|ncr)\s*(\d+)\b/g, '$1 nCr $2');
+  cleanExpr = cleanExpr.replace(/\b(\d+)\s*(?:[pP]|nPr|npr)\s*(\d+)\b/g, '$1 nPr $2');
 
   // If expression begins with a binary operator and ans is provided, continue with Ans
   if (/^[+*\/^%]/.test(cleanExpr) && options.ans !== undefined && options.ans !== null) {
@@ -98,7 +161,7 @@ export function tokenize(expr, options = {}) {
       continue;
     }
 
-    // Multi-letter identifiers (functions, constants, or Ans)
+    // Multi-letter identifiers (functions, constants, operators like mod/nCr, or Ans)
     if (/[a-zA-Z]/.test(char)) {
       let idStr = '';
       while (i < cleanExpr.length && /[a-zA-Z]/.test(cleanExpr[i])) {
@@ -112,7 +175,18 @@ export function tokenize(expr, options = {}) {
         tokens.push({ type: 'constant', value: Math.PI });
       } else if (idStr === 'e') {
         tokens.push({ type: 'constant', value: Math.E });
-      } else if (['sqrt', 'cbrt', 'sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'log', 'ln', 'abs'].includes(idStr)) {
+      } else if (idStr === 'mod') {
+        tokens.push({ type: 'operator', value: 'mod' });
+      } else if (idStr === 'ncr') {
+        tokens.push({ type: 'operator', value: 'nCr' });
+      } else if (idStr === 'npr') {
+        tokens.push({ type: 'operator', value: 'nPr' });
+      } else if ([
+        'sqrt', 'cbrt', 'sin', 'cos', 'tan',
+        'asin', 'acos', 'atan', 'sinh', 'cosh', 'tanh',
+        'asinh', 'acosh', 'atanh', 'log', 'ln', 'abs',
+        'floor', 'ceil', 'round', 'sign', 'trunc'
+      ].includes(idStr)) {
         tokens.push({ type: 'function', value: idStr });
       } else {
         throw new Error(`Unknown identifier: ${idStr}`);
@@ -181,6 +255,9 @@ const PRECEDENCE = {
   '*': 2,
   '/': 2,
   '%': 2,
+  'mod': 2,
+  'nCr': 2.5,
+  'nPr': 2.5,
   '^': 3,
   'u-': 4,
 };
@@ -315,6 +392,16 @@ export function evaluateRPN(rpn, angleMode = 'deg') {
         case '^':
           stack.push(Math.pow(a, b));
           break;
+        case 'mod':
+          if (b === 0) throw new Error('Cannot divide by zero');
+          stack.push(((a % b) + b) % b);
+          break;
+        case 'nCr':
+          stack.push(combinations(a, b));
+          break;
+        case 'nPr':
+          stack.push(permutations(a, b));
+          break;
         default:
           throw new Error(`Unknown operator: ${token.value}`);
       }
@@ -361,6 +448,41 @@ export function evaluateRPN(rpn, angleMode = 'deg') {
         case 'atan':
           stack.push(fromRad(Math.atan(a)));
           break;
+        case 'sinh':
+          stack.push(Math.sinh(a));
+          break;
+        case 'cosh':
+          stack.push(Math.cosh(a));
+          break;
+        case 'tanh':
+          stack.push(Math.tanh(a));
+          break;
+        case 'asinh':
+          stack.push(Math.asinh(a));
+          break;
+        case 'acosh':
+          if (a < 1) throw new Error('Domain error: acosh argument must be >= 1');
+          stack.push(Math.acosh(a));
+          break;
+        case 'atanh':
+          if (Math.abs(a) >= 1) throw new Error('Domain error: atanh argument must be between -1 and 1');
+          stack.push(Math.atanh(a));
+          break;
+        case 'floor':
+          stack.push(Math.floor(a));
+          break;
+        case 'ceil':
+          stack.push(Math.ceil(a));
+          break;
+        case 'round':
+          stack.push(Math.round(a));
+          break;
+        case 'sign':
+          stack.push(Math.sign(a));
+          break;
+        case 'trunc':
+          stack.push(Math.trunc(a));
+          break;
         case 'log':
           if (a <= 0) throw new Error('Domain error: log argument must be > 0');
           stack.push(Math.log10(a));
@@ -387,23 +509,93 @@ export function evaluateRPN(rpn, angleMode = 'deg') {
 
 /**
  * Main evaluation entry point
- * @param {string} expression e.g. "2 + 3 * 4", "Ans * 5", "sqrt(144)", "2^20"
+ * @param {string} expression e.g. "2 + 3 * 4", "Ans * 5", "sqrt(144)", "2^20", "1/2 + 1/3"
  * @param {string} angleMode 'deg' | 'rad'
  * @param {number} ans Previous calculation result
- * @returns {{ result: number, formatted: string }}
+ * @returns {{ result: number, formatted: string, fraction: string|null, mixed: string|null, isFraction: boolean }}
  */
 export function calculate(expression, angleMode = 'deg', ans = 0) {
   if (!expression || !expression.trim()) {
-    return { result: 0, formatted: '0' };
+    return { result: 0, formatted: '0', fraction: null, mixed: null, isFraction: false };
   }
+
+  const rawExpr = expression;
+  const hasFraction = /[\/÷]/.test(rawExpr) || /\b\d+\s+\d+\/\d+\b/.test(rawExpr);
+  const hasExplicitDecimal = /\d+\.\d+/.test(rawExpr);
+  const isFractionCandidate = hasFraction && !hasExplicitDecimal;
 
   const tokens = tokenize(expression, { ans });
   const rpn = toRPN(tokens);
   const rawResult = evaluateRPN(rpn, angleMode);
-  const formatted = cleanNumber(rawResult);
+  let formatted = cleanNumber(rawResult);
+
+  // Check for fraction representation
+  const frac = toFraction(rawResult);
+  let fractionStr = null;
+  let mixedStr = null;
+  let isFraction = false;
+
+  if (frac && frac.d > 1 && frac.d <= 50000) {
+    fractionStr = `${frac.n}/${frac.d}`;
+    if (Math.abs(frac.n) > frac.d) {
+      const whole = Math.trunc(frac.n / frac.d);
+      const rem = Math.abs(frac.n % frac.d);
+      mixedStr = rem !== 0 ? `${whole} ${rem}/${frac.d}` : `${whole}`;
+    } else {
+      mixedStr = fractionStr;
+    }
+
+    if (isFractionCandidate) {
+      formatted = fractionStr;
+      isFraction = true;
+    }
+  }
 
   return {
     result: rawResult,
     formatted,
+    fraction: fractionStr,
+    mixed: mixedStr,
+    isFraction,
   };
+}
+
+/**
+ * Formats calculator engine and runtime errors into clean, user-friendly messages
+ * @param {Error|any} err
+ * @returns {string}
+ */
+export function formatCalculatorError(err) {
+  if (!err) return 'Error';
+  const msg = err.message || String(err);
+
+  if (msg.includes('divide by zero') || msg.includes('Division by zero')) {
+    return 'Cannot divide by zero';
+  }
+  if (msg.includes('Domain error') || msg.includes('negative number')) {
+    return msg;
+  }
+  if (msg.includes('Factorial only defined') || msg.includes('Factorial requires')) {
+    return 'Factorial requires a non-negative integer';
+  }
+  if (msg.includes('nCr') || msg.includes('nPr')) {
+    return msg;
+  }
+  if (msg.includes('Missing argument') || msg.includes('requires a valid argument')) {
+    return 'Function requires a valid argument';
+  }
+  if (msg.includes('Mismatched parentheses')) {
+    return 'Mismatched parentheses';
+  }
+  if (msg.includes('Unknown identifier') || msg.includes('Unexpected character') || msg.includes('Invalid input')) {
+    return 'Invalid input';
+  }
+  if (err instanceof SyntaxError || msg.includes('Invalid expression') || msg.includes('syntax')) {
+    return 'Invalid expression';
+  }
+  if (err instanceof TypeError || err instanceof ReferenceError) {
+    console.error('Calculator application error:', err);
+    return 'Invalid expression';
+  }
+  return msg.length <= 32 ? msg : 'Invalid expression';
 }

@@ -45,3 +45,11 @@ export function clearUnifiedHistory() {
   setItem(HISTORY_KEY, []);
   return [];
 }
+
+export function clearToolHistory(toolId) {
+  if (!toolId) return clearUnifiedHistory();
+  const existing = getUnifiedHistory();
+  const updated = existing.filter((item) => item.toolId !== toolId);
+  setItem(HISTORY_KEY, updated);
+  return updated;
+}

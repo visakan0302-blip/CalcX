@@ -342,6 +342,49 @@ assert('138. Age from 2000-01-01 to 2026-01-01 = 26 years', age1.years, 26);
 assert('139. Age months = 0', age1.months, 0);
 assert('140. Age days = 0', age1.days, 0);
 
+// ----------------------------------------------------
+// MODULE 16: SMART CALCULATOR FRACTIONS (8 Tests)
+// ----------------------------------------------------
+const frac1 = calculate('1/2 + 1/3');
+assert('141. Fraction addition formatted: 1/2 + 1/3 = 5/6', frac1.formatted, '5/6');
+assert('142. Fraction addition numeric: 1/2 + 1/3', frac1.result, 5 / 6, 1e-9);
+
+const frac2 = calculate('3/4 - 2/5');
+assert('143. Fraction subtraction formatted: 3/4 - 2/5 = 7/20', frac2.formatted, '7/20');
+assert('144. Fraction subtraction numeric: 3/4 - 2/5', frac2.result, 7 / 20, 1e-9);
+
+const frac3 = calculate('2/3 * 3/5');
+assert('145. Fraction multiplication formatted: 2/3 * 3/5 = 2/5', frac3.formatted, '2/5');
+assert('146. Fraction multiplication numeric: 2/3 * 3/5', frac3.result, 2 / 5, 1e-9);
+
+const frac4 = calculate('5/6 / 2/3');
+assert('147. Fraction division formatted: 5/6 / 2/3 = 5/4', frac4.formatted, '5/4');
+assert('148. Fraction division numeric: 5/6 / 2/3', frac4.result, 5 / 4, 1e-9);
+
+const frac5 = calculate('5/6 ÷ 2/3');
+assert('149. Fraction division unicode: 5/6 ÷ 2/3 = 5/4', frac5.formatted, '5/4');
+
+const frac6 = calculate('1 1/2 + 2 1/4');
+assert('150. Mixed fraction arithmetic: 1 1/2 + 2 1/4 = 15/4', frac6.formatted, '15/4');
+
+// ----------------------------------------------------
+// MODULE 17: ADVANCED SCIENTIFIC & COMBINATORICS (14 Tests)
+// ----------------------------------------------------
+assert('151. Inverse trig asin(1) = 90° in DEG mode', calculate('asin(1)', 'deg').result, 90, 1e-6);
+assert('152. Inverse trig acos(1) = 0° in DEG mode', calculate('acos(1)', 'deg').result, 0, 1e-6);
+assert('153. Inverse trig atan(1) = 45° in DEG mode', calculate('atan(1)', 'deg').result, 45, 1e-6);
+assert('154. Square root sqrt(144) = 12', calculate('sqrt(144)').result, 12);
+assert('155. Cube root cbrt(27) = 3', calculate('cbrt(27)').result, 3);
+assert('156. Factorial 5! = 120', calculate('5!').result, 120);
+assert('157. Combinations 8C2 = 28', calculate('8C2').result, 28);
+assert('158. Permutations 8P2 = 56', calculate('8P2').result, 56);
+assert('159. Combinations nCr syntax: 8 nCr 2 = 28', calculate('8 nCr 2').result, 28);
+assert('160. Permutations nPr syntax: 8 nPr 2 = 56', calculate('8 nPr 2').result, 56);
+assert('161. Modulo: 10 mod 3 = 1', calculate('10 mod 3').result, 1);
+assert('162. Hyperbolic sinh(0) = 0', calculate('sinh(0)').result, 0, 1e-6);
+assert('163. Hyperbolic cosh(0) = 1', calculate('cosh(0)').result, 1, 1e-6);
+assert('164. Math functions: floor(3.7) = 3', calculate('floor(3.7)').result, 3);
+
 console.log('\n====================================================');
 console.log(`📊 TEST SUITE SUMMARY:`);
 console.log(`   Total Tests:  ${passed + failed}`);

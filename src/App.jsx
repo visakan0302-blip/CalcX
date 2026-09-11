@@ -28,6 +28,7 @@ import { HistoryPage } from './pages/HistoryPage';
 import { SettingsPage } from './pages/SettingsPage';
 
 import { getItem, setItem } from './utils/storage';
+import { TOOLS } from './components/Navigation/toolsConfig';
 import { WifiOff } from 'lucide-react';
 
 const THEME_KEY = 'calcx_theme_v1';
@@ -52,6 +53,19 @@ export default function App() {
   const effectiveTheme = themeMode === 'system' ? (systemIsLight ? 'light' : 'dark') : themeMode;
 
   const [activeTool, setActiveTool] = useState(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const paramTool = params.get('tool');
+      if (paramTool && TOOLS.some((t) => t.id === paramTool)) {
+        return paramTool;
+      }
+      const hash = window.location.hash.replace(/^#\/?/, '');
+      if (hash && TOOLS.some((t) => t.id === hash)) {
+        return hash;
+      }
+    } catch {
+      // ignore
+    }
     return getItem(LAST_TOOL_KEY, 'dashboard');
   });
 
@@ -71,6 +85,33 @@ export default function App() {
     };
   }, []);
 
+  // Listen to URL changes (back/forward, hash changes)
+  useEffect(() => {
+    const handleUrlChange = () => {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const paramTool = params.get('tool');
+        if (paramTool && TOOLS.some((t) => t.id === paramTool)) {
+          setActiveTool(paramTool);
+          return;
+        }
+        const hash = window.location.hash.replace(/^#\/?/, '');
+        if (hash && TOOLS.some((t) => t.id === hash)) {
+          setActiveTool(hash);
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    window.addEventListener('popstate', handleUrlChange);
+    window.addEventListener('hashchange', handleUrlChange);
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+      window.removeEventListener('hashchange', handleUrlChange);
+    };
+  }, []);
+
   // Apply theme class to <body> and root
   useEffect(() => {
     document.documentElement.className = `theme-${effectiveTheme}`;
@@ -78,10 +119,17 @@ export default function App() {
     setItem(THEME_KEY, themeMode);
   }, [effectiveTheme, themeMode]);
 
-  // Persist last active tool
+  // Persist last active tool and dynamically update SEO document title
   useEffect(() => {
     setItem(LAST_TOOL_KEY, activeTool);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const currentTool = TOOLS.find((t) => t.id === activeTool);
+    if (activeTool === 'dashboard' || !currentTool) {
+      document.title = 'CalcX — Free Online Calculators & Math Tools';
+    } else {
+      document.title = `${currentTool.name} — CalcX`;
+    }
   }, [activeTool]);
 
   const toggleTheme = () => {

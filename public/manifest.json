@@ -1,15 +1,16 @@
 {
-  "name": "CalcX Commercial Calculator Suite",
+  "name": "CalcX — Free Online Calculators & Math Tools",
   "short_name": "CalcX",
-  "description": "Calculate anything. Convert everything. Professional all-in-one calculation and conversion suite.",
-  "start_url": "/",
+  "description": "CalcX is a free online calculator suite for EMI, GST, BMI, age, percentage, interest, discount, salary, currency conversion, fractions, statistics and more.",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#6366f1",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "./favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"

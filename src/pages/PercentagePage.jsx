@@ -7,9 +7,10 @@ import { Input } from '../components/common/Input';
 import { Button } from '../components/common/Button';
 import { ResultCard } from '../components/common/ResultCard';
 import { ToolLayout } from '../components/common/ToolLayout';
+import { SeoSection } from '../components/common/SeoSection';
 import { logCalculation } from '../utils/unifiedHistory';
 
-export function PercentagePage() {
+export function PercentagePage({ onSelectTool }) {
   const [mode, setMode] = useState('what_is_x_pct_of_y');
 
   // Values for Mode A: What is X% of Y?
@@ -62,8 +63,8 @@ export function PercentagePage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <PageHeader
-        title="Percentage Calculator"
-        description="Compute proportions, find what percentage one value is of another, and calculate percentage changes."
+        title="Percentage Calculator — Free Online Tool"
+        description="Calculate what is X% of Y, find what percentage X is of Y, and calculate percentage increase or decrease instantly with clear steps."
         icon={Percent}
       />
 
@@ -250,6 +251,8 @@ export function PercentagePage() {
           )}
         </div>
       </ToolLayout>
+
+      <SeoSection toolId="percentage" onSelectTool={onSelectTool} />
     </div>
   );
 }

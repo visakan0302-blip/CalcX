@@ -9,9 +9,10 @@ import { Button } from '../components/common/Button';
 import { ResultCard } from '../components/common/ResultCard';
 import { ToolLayout } from '../components/common/ToolLayout';
 import { ResetButton } from '../components/common/ResetButton';
+import { SeoSection } from '../components/common/SeoSection';
 import { logCalculation } from '../utils/unifiedHistory';
 
-export function DiscountPage() {
+export function DiscountPage({ onSelectTool }) {
   const [originalPrice, setOriginalPrice] = useState('2000');
   const [discountPercent, setDiscountPercent] = useState('20');
   const [taxPercent, setTaxPercent] = useState('0');
@@ -41,8 +42,8 @@ export function DiscountPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <PageHeader
-        title="Discount Calculator"
-        description="Calculate promotional savings, discounted sale prices, and optional post-discount sales taxes."
+        title="Discount Calculator — Sale Savings & Price"
+        description="Calculate sale discounts, money saved, final discounted price, and optional sales tax instantly."
         icon={Tag}
         actions={
           <Select
@@ -165,6 +166,8 @@ export function DiscountPage() {
           </Button>
         </div>
       </ToolLayout>
+
+      <SeoSection toolId="discount" onSelectTool={onSelectTool} />
     </div>
   );
 }

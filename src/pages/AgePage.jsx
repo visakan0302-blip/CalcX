@@ -8,8 +8,9 @@ import { Input } from '../components/common/Input';
 import { Button } from '../components/common/Button';
 import { ResultCard } from '../components/common/ResultCard';
 import { ToolLayout } from '../components/common/ToolLayout';
+import { SeoSection } from '../components/common/SeoSection';
 
-export function AgePage() {
+export function AgePage({ onSelectTool }) {
   const todayISO = formatToISODate(new Date());
   const [dob, setDob] = useState('2000-01-01');
   const [asOfOption, setAsOfOption] = useState('today'); // 'today' | 'custom'
@@ -29,8 +30,8 @@ export function AgePage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <PageHeader
-        title="Age Calculator"
-        description="Calculate precise chronological age, milestone breakdowns, and next birthday countdowns."
+        title="Age Calculator — Calculate Your Exact Age"
+        description="Calculate your exact age in years, months, weeks, days, hours, and minutes with next birthday countdowns and lifetime milestones."
         icon={Cake}
       />
 
@@ -215,6 +216,8 @@ export function AgePage() {
           )}
         </div>
       </ToolLayout>
+
+      <SeoSection toolId="age" onSelectTool={onSelectTool} />
     </div>
   );
 }

@@ -5,9 +5,10 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
 import { CopyButton } from '../components/common/CopyButton';
+import { SeoSection } from '../components/common/SeoSection';
 import { getUnifiedHistory, logCalculation, clearToolHistory } from '../utils/unifiedHistory';
 
-export function CalculatorPage() {
+export function CalculatorPage({ onSelectTool }) {
   const [expression, setExpression] = useState('');
   const [displayValue, setDisplayValue] = useState('0');
   const [lastAnswer, setLastAnswer] = useState(0);
@@ -238,8 +239,8 @@ export function CalculatorPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <PageHeader
-        title="Smart Calculator"
-        description="High-precision arithmetic, fractions, scientific trigonometry, logarithms, combinatorics, and powers."
+        title="Free Online Scientific Calculator"
+        description="Scientific calculator with natural expressions, Ans memory recall, trigonometric functions in DEG and RAD, logs, powers, and calculation history."
         icon={CalcIcon}
         actions={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -506,6 +507,8 @@ export function CalculatorPage() {
           </Card>
         )}
       </div>
+
+      <SeoSection toolId="calculator" onSelectTool={onSelectTool} />
     </div>
   );
 }

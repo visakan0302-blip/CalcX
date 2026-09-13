@@ -8,9 +8,10 @@ import { Button } from '../components/common/Button';
 import { ResultCard } from '../components/common/ResultCard';
 import { ToolLayout } from '../components/common/ToolLayout';
 import { ResetButton } from '../components/common/ResetButton';
+import { SeoSection } from '../components/common/SeoSection';
 import { logCalculation } from '../utils/unifiedHistory';
 
-export function GSTPage() {
+export function GSTPage({ onSelectTool }) {
   const [amount, setAmount] = useState('1000');
   const [selectedRate, setSelectedRate] = useState(18);
   const [customRate, setCustomRate] = useState('');
@@ -42,8 +43,8 @@ export function GSTPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <PageHeader
-        title="GST Calculator (India)"
-        description="Calculate Goods and Services Tax with inclusive/exclusive modes and CGST + SGST statutory splits."
+        title="GST Calculator — Inclusive & Exclusive GST"
+        description="Calculate Goods and Services Tax (GST) online. Add or remove 5%, 12%, 18%, or 28% GST with exact CGST and SGST splits."
         icon={BadgePercent}
       />
 
@@ -189,6 +190,8 @@ export function GSTPage() {
           </Button>
         </div>
       </ToolLayout>
+
+      <SeoSection toolId="gst" onSelectTool={onSelectTool} />
     </div>
   );
 }

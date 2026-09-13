@@ -28,6 +28,8 @@ import { convertUnits } from '../src/services/unitConverter.js';
 import { calculateBMI } from '../src/services/bmiCalculator.js';
 import { calculateDateDifference, isLeapYear } from '../src/services/dateCalculator.js';
 import { calculateAge } from '../src/services/ageCalculator.js';
+import { SEO_PAGES, getSeoForTool } from '../src/data/seoConfig.js';
+import { TOOLS, getToolPath, getToolUrl } from '../src/components/Navigation/toolsConfig.js';
 
 let passed = 0;
 let failed = 0;
@@ -384,6 +386,20 @@ assert('161. Modulo: 10 mod 3 = 1', calculate('10 mod 3').result, 1);
 assert('162. Hyperbolic sinh(0) = 0', calculate('sinh(0)').result, 0, 1e-6);
 assert('163. Hyperbolic cosh(0) = 1', calculate('cosh(0)').result, 1, 1e-6);
 assert('164. Math functions: floor(3.7) = 3', calculate('floor(3.7)').result, 3);
+
+// ----------------------------------------------------
+// MODULE 18: SEO CONFIGURATION & ROUTE INTEGRITY (10 Tests)
+// ----------------------------------------------------
+assert('165. Exactly 9 core calculators configured for SEO', Object.keys(SEO_PAGES).length, 9);
+assert('166. BMI Calculator SEO route & canonical', SEO_PAGES.bmi.canonical, 'https://visakan0302-blip.github.io/CalcX/bmi-calculator/');
+assert('167. Age Calculator SEO route & canonical', SEO_PAGES.age.canonical, 'https://visakan0302-blip.github.io/CalcX/age-calculator/');
+assert('168. Percentage Calculator SEO route & canonical', SEO_PAGES.percentage.canonical, 'https://visakan0302-blip.github.io/CalcX/percentage-calculator/');
+assert('169. EMI Calculator SEO route & canonical', SEO_PAGES.emi.canonical, 'https://visakan0302-blip.github.io/CalcX/emi-calculator/');
+assert('170. GST Calculator SEO route & canonical', SEO_PAGES.gst.canonical, 'https://visakan0302-blip.github.io/CalcX/gst-calculator/');
+assert('171. Interest Calculator SEO route & canonical', SEO_PAGES.interest.canonical, 'https://visakan0302-blip.github.io/CalcX/interest-calculator/');
+assert('172. Discount Calculator SEO route & canonical', SEO_PAGES.discount.canonical, 'https://visakan0302-blip.github.io/CalcX/discount-calculator/');
+assert('173. Fraction Calculator SEO route & canonical', SEO_PAGES.fraction.canonical, 'https://visakan0302-blip.github.io/CalcX/fraction-calculator/');
+assert('174. Scientific Calculator SEO route & canonical', SEO_PAGES.calculator.canonical, 'https://visakan0302-blip.github.io/CalcX/scientific-calculator/');
 
 console.log('\n====================================================');
 console.log(`📊 TEST SUITE SUMMARY:`);

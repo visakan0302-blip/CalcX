@@ -28,11 +28,53 @@ import { HistoryPage } from './pages/HistoryPage';
 import { SettingsPage } from './pages/SettingsPage';
 
 import { getItem, setItem } from './utils/storage';
-import { TOOLS } from './components/Navigation/toolsConfig';
+import { TOOLS, getToolUrl } from './components/Navigation/toolsConfig';
+import { updateDocumentHead } from './utils/seoHelper';
 import { WifiOff } from 'lucide-react';
 
 const THEME_KEY = 'calcx_theme_v1';
 const LAST_TOOL_KEY = 'calcx_last_tool_v1';
+
+function getInitialTool() {
+  try {
+    const pathname = window.location.pathname;
+    // 1. Check path matches for core SEO tools
+    for (const tool of TOOLS) {
+      if (tool.path) {
+        const slug = tool.path.replace(/\/$/, '');
+        if (pathname.includes(`/${slug}/`) || pathname.endsWith(`/${slug}`)) {
+          return tool.id;
+        }
+      }
+    }
+    const params = new URLSearchParams(window.location.search);
+    // 2. Check 404 redirect param e.g. ?p=/bmi-calculator/
+    const redirectPath = params.get('p');
+    if (redirectPath) {
+      for (const tool of TOOLS) {
+        if (tool.path) {
+          const slug = tool.path.replace(/\/$/, '');
+          if (redirectPath.includes(`/${slug}/`) || redirectPath.includes(slug)) {
+            return tool.id;
+          }
+        }
+      }
+    }
+    // 3. Check query param e.g. ?tool=bmi
+    const paramTool = params.get('tool');
+    if (paramTool && TOOLS.some((t) => t.id === paramTool)) {
+      return paramTool;
+    }
+    // 4. Check hash e.g. #bmi
+    const hash = window.location.hash.replace(/^#\/?/, '');
+    if (hash && TOOLS.some((t) => t.id === hash)) {
+      return hash;
+    }
+  } catch {
+    // ignore
+  }
+  return getItem(LAST_TOOL_KEY, 'dashboard');
+}
 
 export default function App() {
   const [themeMode, setThemeMode] = useState(() => {
@@ -52,22 +94,7 @@ export default function App() {
 
   const effectiveTheme = themeMode === 'system' ? (systemIsLight ? 'light' : 'dark') : themeMode;
 
-  const [activeTool, setActiveTool] = useState(() => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const paramTool = params.get('tool');
-      if (paramTool && TOOLS.some((t) => t.id === paramTool)) {
-        return paramTool;
-      }
-      const hash = window.location.hash.replace(/^#\/?/, '');
-      if (hash && TOOLS.some((t) => t.id === hash)) {
-        return hash;
-      }
-    } catch {
-      // ignore
-    }
-    return getItem(LAST_TOOL_KEY, 'dashboard');
-  });
+  const [activeTool, setActiveTool] = useState(getInitialTool);
 
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -88,19 +115,9 @@ export default function App() {
   // Listen to URL changes (back/forward, hash changes)
   useEffect(() => {
     const handleUrlChange = () => {
-      try {
-        const params = new URLSearchParams(window.location.search);
-        const paramTool = params.get('tool');
-        if (paramTool && TOOLS.some((t) => t.id === paramTool)) {
-          setActiveTool(paramTool);
-          return;
-        }
-        const hash = window.location.hash.replace(/^#\/?/, '');
-        if (hash && TOOLS.some((t) => t.id === hash)) {
-          setActiveTool(hash);
-        }
-      } catch {
-        // ignore
+      const tool = getInitialTool();
+      if (tool) {
+        setActiveTool(tool);
       }
     };
 
@@ -119,18 +136,23 @@ export default function App() {
     setItem(THEME_KEY, themeMode);
   }, [effectiveTheme, themeMode]);
 
-  // Persist last active tool and dynamically update SEO document title
+  // Persist last active tool and dynamically update SEO document title & head metadata
   useEffect(() => {
     setItem(LAST_TOOL_KEY, activeTool);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    const currentTool = TOOLS.find((t) => t.id === activeTool);
-    if (activeTool === 'dashboard' || !currentTool) {
-      document.title = 'CalcX — Free Online Calculators & Math Tools';
-    } else {
-      document.title = `${currentTool.name} — CalcX`;
-    }
+    updateDocumentHead(activeTool);
   }, [activeTool]);
+
+  const handleSelectTool = (toolId, shouldPushState = true) => {
+    setActiveTool(toolId);
+    if (shouldPushState && typeof window !== 'undefined') {
+      const url = getToolUrl(toolId);
+      const currentFullUrl = window.location.pathname + window.location.search;
+      if (currentFullUrl !== url) {
+        window.history.pushState({ toolId }, '', url);
+      }
+    }
+  };
 
   const toggleTheme = () => {
     setThemeMode((prev) => (prev === 'dark' ? 'light' : 'dark'));
@@ -139,9 +161,9 @@ export default function App() {
   const renderActiveToolPage = () => {
     switch (activeTool) {
       case 'dashboard':
-        return <DashboardPage onSelectTool={setActiveTool} />;
+        return <DashboardPage onSelectTool={handleSelectTool} />;
       case 'calculator':
-        return <CalculatorPage />;
+        return <CalculatorPage onSelectTool={handleSelectTool} />;
       case 'unit':
         return <UnitConverterPage />;
       case 'currency':
@@ -151,31 +173,31 @@ export default function App() {
       case 'statistics':
         return <StatisticsPage />;
       case 'emi':
-        return <EMIPage />;
+        return <EMIPage onSelectTool={handleSelectTool} />;
       case 'interest':
-        return <InterestPage />;
+        return <InterestPage onSelectTool={handleSelectTool} />;
       case 'gst':
-        return <GSTPage />;
+        return <GSTPage onSelectTool={handleSelectTool} />;
       case 'salary':
         return <SalaryPage />;
       case 'discount':
-        return <DiscountPage />;
+        return <DiscountPage onSelectTool={handleSelectTool} />;
       case 'tip':
         return <TipPage />;
       case 'bmi':
-        return <BMIPage />;
+        return <BMIPage onSelectTool={handleSelectTool} />;
       case 'date':
         return <DatePage />;
       case 'age':
-        return <AgePage />;
+        return <AgePage onSelectTool={handleSelectTool} />;
       case 'percentage':
-        return <PercentagePage />;
+        return <PercentagePage onSelectTool={handleSelectTool} />;
       case 'fraction':
-        return <FractionPage />;
+        return <FractionPage onSelectTool={handleSelectTool} />;
       case 'random':
         return <RandomPage />;
       case 'history':
-        return <HistoryPage onSelectTool={setActiveTool} />;
+        return <HistoryPage onSelectTool={handleSelectTool} />;
       case 'settings':
         return (
           <SettingsPage
@@ -187,7 +209,7 @@ export default function App() {
           />
         );
       default:
-        return <DashboardPage onSelectTool={setActiveTool} />;
+        return <DashboardPage onSelectTool={handleSelectTool} />;
     }
   };
 
@@ -196,7 +218,7 @@ export default function App() {
       {/* Desktop Sidebar */}
       <Sidebar
         activeTool={activeTool}
-        onSelectTool={setActiveTool}
+        onSelectTool={handleSelectTool}
         theme={effectiveTheme}
         onToggleTheme={toggleTheme}
         onOpenAbout={() => setIsAboutOpen(true)}
@@ -207,7 +229,7 @@ export default function App() {
         {/* Mobile Navigation Header & Drawer */}
         <MobileNav
           activeTool={activeTool}
-          onSelectTool={setActiveTool}
+          onSelectTool={handleSelectTool}
           theme={effectiveTheme}
           onToggleTheme={toggleTheme}
           onOpenAbout={() => setIsAboutOpen(true)}

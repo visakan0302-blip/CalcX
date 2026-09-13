@@ -50,6 +50,7 @@ export const TOOLS = [
     id: 'calculator',
     name: 'Smart Calculator',
     shortName: 'Calc',
+    path: 'scientific-calculator/',
     icon: Calculator,
     description: 'Natural expressions, Ans previous answer, scientific trig, logs, powers, and memory',
     category: 'CALCULATE',
@@ -101,6 +102,7 @@ export const TOOLS = [
     id: 'emi',
     name: 'EMI / Loan Calculator',
     shortName: 'EMI',
+    path: 'emi-calculator/',
     icon: Landmark,
     description: 'Monthly loan EMI, total interest, and complete month-by-month amortization schedule',
     category: 'FINANCE',
@@ -110,6 +112,7 @@ export const TOOLS = [
     id: 'interest',
     name: 'Interest Calculator',
     shortName: 'Interest',
+    path: 'interest-calculator/',
     icon: TrendingUp,
     description: 'Simple Interest, Compound Interest, side-by-side comparison, and SIP investments',
     category: 'FINANCE',
@@ -119,6 +122,7 @@ export const TOOLS = [
     id: 'gst',
     name: 'GST Calculator (India)',
     shortName: 'GST',
+    path: 'gst-calculator/',
     icon: BadgePercent,
     description: 'Standard 5%, 12%, 18%, 28% GST with inclusive/exclusive modes and CGST+SGST split',
     category: 'FINANCE',
@@ -137,6 +141,7 @@ export const TOOLS = [
     id: 'discount',
     name: 'Discount Calculator',
     shortName: 'Discount',
+    path: 'discount-calculator/',
     icon: Tag,
     description: 'Calculate sale savings, net price after discount, and optional sales tax',
     category: 'FINANCE',
@@ -157,6 +162,7 @@ export const TOOLS = [
     id: 'bmi',
     name: 'BMI Calculator',
     shortName: 'BMI',
+    path: 'bmi-calculator/',
     icon: Scale,
     description: 'Body Mass Index calculator with visual health scale, category, and ranges',
     category: 'HEALTH',
@@ -177,6 +183,7 @@ export const TOOLS = [
     id: 'age',
     name: 'Age Calculator',
     shortName: 'Age',
+    path: 'age-calculator/',
     icon: Cake,
     description: 'Exact age in years, months, days, lifetime stats, and birthday countdown',
     category: 'DATE_TIME',
@@ -188,6 +195,7 @@ export const TOOLS = [
     id: 'percentage',
     name: 'Percentage Calculator',
     shortName: 'Percent',
+    path: 'percentage-calculator/',
     icon: Percent,
     description: 'X% of Y, X as % of Y, percentage increase, and percentage decrease',
     category: 'TOOLS',
@@ -197,6 +205,7 @@ export const TOOLS = [
     id: 'fraction',
     name: 'Fraction Calculator',
     shortName: 'Fraction',
+    path: 'fraction-calculator/',
     icon: Divide,
     description: 'Add, subtract, multiply, and divide fractions with automated GCD simplification',
     category: 'TOOLS',
@@ -232,3 +241,26 @@ export const TOOLS = [
     color: '#475569',
   },
 ];
+
+/**
+ * Returns the route path for a tool
+ */
+export function getToolPath(toolId) {
+  const tool = TOOLS.find((t) => t.id === toolId);
+  if (!tool) return '';
+  if (tool.id === 'dashboard') return '';
+  if (tool.path) return tool.path;
+  return `?tool=${tool.id}`;
+}
+
+/**
+ * Returns the complete client URL for a tool based on Vite BASE_URL
+ */
+export function getToolUrl(toolId, baseUrl = import.meta.env?.BASE_URL || '/CalcX/') {
+  const path = getToolPath(toolId);
+  const normalizedBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+  if (!path) return normalizedBase;
+  if (path.startsWith('?')) return `${normalizedBase}${path}`;
+  return `${normalizedBase}${path}`;
+}
+

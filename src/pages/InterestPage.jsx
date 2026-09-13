@@ -13,9 +13,10 @@ import { Select } from '../components/common/Select';
 import { Button } from '../components/common/Button';
 import { ResultCard } from '../components/common/ResultCard';
 import { ToolLayout } from '../components/common/ToolLayout';
+import { SeoSection } from '../components/common/SeoSection';
 import { logCalculation } from '../utils/unifiedHistory';
 
-export function InterestPage() {
+export function InterestPage({ onSelectTool }) {
   const [activeTab, setActiveTab] = useState('simple'); // 'simple' | 'compound' | 'compare' | 'sip'
   const [currency, setCurrency] = useState('₹');
 
@@ -82,8 +83,8 @@ export function InterestPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <PageHeader
-        title="Money Interest Calculator"
-        description="Calculate Simple Interest, Compound Interest, side-by-side growth comparisons, and regular SIP investments."
+        title="Simple & Compound Interest Calculator"
+        description="Calculate Simple Interest (SI) and Compound Interest (CI) with flexible compounding options, side-by-side comparison, and regular SIP growth."
         icon={TrendingUp}
         actions={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -543,6 +544,8 @@ export function InterestPage() {
           </div>
         </ToolLayout>
       )}
+
+      <SeoSection toolId="interest" onSelectTool={onSelectTool} />
     </div>
   );
 }

@@ -7,9 +7,10 @@ import { Input } from '../components/common/Input';
 import { Button } from '../components/common/Button';
 import { ResultCard } from '../components/common/ResultCard';
 import { ToolLayout } from '../components/common/ToolLayout';
+import { SeoSection } from '../components/common/SeoSection';
 import { logCalculation } from '../utils/unifiedHistory';
 
-export function FractionPage() {
+export function FractionPage({ onSelectTool }) {
   const [num1, setNum1] = useState('1');
   const [den1, setDen1] = useState('2');
   const [operator, setOperator] = useState('+');
@@ -37,8 +38,8 @@ export function FractionPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <PageHeader
-        title="Fraction Calculator"
-        description="Add, subtract, multiply, and divide fractions with automated GCD simplification and decimal conversion."
+        title="Fraction Calculator — Add, Subtract, Multiply & Divide"
+        description="Add, subtract, multiply, and divide fractions and mixed numbers with automated GCD simplification and decimal conversion."
         icon={Divide}
       />
 
@@ -211,6 +212,8 @@ export function FractionPage() {
           )}
         </div>
       </ToolLayout>
+
+      <SeoSection toolId="fraction" onSelectTool={onSelectTool} />
     </div>
   );
 }

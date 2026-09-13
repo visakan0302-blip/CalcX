@@ -9,9 +9,10 @@ import { Button } from '../components/common/Button';
 import { ResultCard } from '../components/common/ResultCard';
 import { ToolLayout } from '../components/common/ToolLayout';
 import { ResetButton } from '../components/common/ResetButton';
+import { SeoSection } from '../components/common/SeoSection';
 import { logCalculation } from '../utils/unifiedHistory';
 
-export function EMIPage() {
+export function EMIPage({ onSelectTool }) {
   const [loanAmount, setLoanAmount] = useState('1000000');
   const [annualRate, setAnnualRate] = useState('8.5');
   const [tenure, setTenure] = useState('5');
@@ -44,8 +45,8 @@ export function EMIPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <PageHeader
-        title="EMI / Loan Calculator"
-        description="Calculate monthly installment (EMI), total interest, and full repayment amortization schedule."
+        title="EMI Calculator — Loan & Home Loan EMI"
+        description="Calculate monthly loan EMI, total interest payable, and complete repayment amortization schedule for home loans, car loans, and personal credit."
         icon={Landmark}
         actions={
           <Select
@@ -259,6 +260,8 @@ export function EMIPage() {
           </div>
         </Card>
       )}
+
+      <SeoSection toolId="emi" onSelectTool={onSelectTool} />
     </div>
   );
 }

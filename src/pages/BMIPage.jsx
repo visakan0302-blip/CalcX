@@ -7,8 +7,9 @@ import { Input } from '../components/common/Input';
 import { Button } from '../components/common/Button';
 import { ResultCard } from '../components/common/ResultCard';
 import { ToolLayout } from '../components/common/ToolLayout';
+import { SeoSection } from '../components/common/SeoSection';
 
-export function BMIPage() {
+export function BMIPage({ onSelectTool }) {
   const [heightUnit, setHeightUnit] = useState('cm'); // 'cm' | 'm' | 'ft_in'
   const [weightUnit, setWeightUnit] = useState('kg'); // 'kg' | 'lb'
 
@@ -48,8 +49,8 @@ export function BMIPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <PageHeader
-        title="BMI Calculator"
-        description="Calculate Body Mass Index and visualize your health category on the WHO standard scale."
+        title="Free Online BMI Calculator"
+        description="Calculate your Body Mass Index (BMI) and check your healthy weight range with instant WHO classifications, metric and imperial units."
         icon={Scale}
         actions={
           <Button variant="ghost" size="sm" icon={RotateCcw} onClick={handleReset}>
@@ -300,6 +301,8 @@ export function BMIPage() {
           )}
         </div>
       </ToolLayout>
+
+      <SeoSection toolId="bmi" onSelectTool={onSelectTool} />
     </div>
   );
 }
